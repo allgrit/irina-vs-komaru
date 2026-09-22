@@ -1,0 +1,5 @@
+#!/bin/sh
+# Гейт коммита: синтаксис всех модулей и тесты.
+set -e
+node scripts/check.mjs
+node --test "tests/**/*.test.js"
