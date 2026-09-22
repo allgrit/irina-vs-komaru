@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Ирина против комаров</title>
+  <meta name="description" content="Ирочка пытается уснуть, а комары не дают. Роглайт-аркада: лови комаров, выбирай перки, выживи до утра." />
+  <meta property="og:title" content="Ирина против комаров" />
+  <meta property="og:description" content="Роглайт-аркада про бессонную ночь. Лови комаров шестью инструментами, качайся, бей рекорды." />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%231b2140'/%3E%3Ctext x='32' y='42' font-size='30' text-anchor='middle'%3E🦟%3C/text%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="viewport">
+    <div id="stage">
+      <canvas id="game" width="960" height="540"></canvas>
+      <div id="hud" class="hidden">
+        <div class="hud-top">
+          <div class="hud-block hud-clock">
+            <div class="clock" id="hud-clock">23:00</div>
+            <div class="bar hour-bar"><div class="fill" id="hud-hour"></div></div>
+            <div class="hearts" id="hud-hearts"></div>
+          </div>
+          <div class="hud-block hud-sleep">
+            <div class="label"><span>Сон Ирины</span><span id="hud-sleep-pct">0 %</span></div>
+            <div class="bar sleep-bar"><div class="fill" id="hud-sleep"></div></div>
+            <div class="status" id="hud-status"></div>
+          </div>
+          <div class="hud-block hud-score">
+            <div class="score" id="hud-score">0</div>
+            <div class="combo" id="hud-combo">×1</div>
+          </div>
+        </div>
+        <div class="hud-bottom">
+          <div class="toolbar" id="hud-tools"></div>
+          <div class="toolbar side">
+            <button class="tool lamp" id="hud-lamp" data-action="lamp" title="Лампа (L)"><span class="icon">💡</span><span class="key">L</span></button>
+            <button class="tool" data-action="pause" title="Пауза (Esc)"><span class="icon">⏸</span></button>
+          </div>
+        </div>
+      </div>
+      <div id="screens"></div>
+      <div id="toasts"></div>
+    </div>
+  </div>
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>

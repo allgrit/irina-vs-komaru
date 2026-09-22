@@ -21,7 +21,7 @@ test('код результата обратим', () => {
   entry.night = 3;
   entry.hours = 5;
   const code = encodeResult(entry);
-  assert.match(code, /^IVK1-/);
+  assert.match(code, /^IVK1-Ирина_Ч~/);
   const back = decodeResult(code);
   assert.equal(back.score, 4321);
   assert.equal(back.night, 3);

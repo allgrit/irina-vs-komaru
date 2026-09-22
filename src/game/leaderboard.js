@@ -32,7 +32,7 @@ export function encodeResult(entry) {
   const dateNum = Number(entry.date.replace(/-/g, ''));
   const fields = [entry.score, entry.night, entry.hours, dateNum, entry.seedHash || 0, entry.daily ? 1 : 0];
   const payload = fields.map((n) => Math.max(0, Math.floor(n)).toString(36)).join('.');
-  const name = encodeURIComponent(cleanName(entry.name));
+  const name = cleanName(entry.name).replace(/ /g, '_');
   const body = `${name}~${payload}`;
   return `IVK1-${body}-${checksum(body)}`;
 }
@@ -50,12 +50,7 @@ export function decodeResult(code) {
   const [score, night, hours, dateNum, seedHash, daily] = parts;
   const ds = String(dateNum).padStart(8, '0');
   const date = `${ds.slice(0, 4)}-${ds.slice(4, 6)}-${ds.slice(6, 8)}`;
-  let decodedName;
-  try {
-    decodedName = cleanName(decodeURIComponent(name));
-  } catch {
-    return null;
-  }
+  const decodedName = cleanName(name.replace(/_/g, ' '));
   return { name: decodedName, score, night, hours, date, seedHash, daily: daily === 1, imported: true };
 }
 
