@@ -18,7 +18,8 @@ export function createInput(canvas, world, handlers) {
     state.sx = p.x;
     state.sy = p.y;
     state.down = true;
-    handlers.press?.(p);
+    state.touch = e.pointerType === 'touch';
+    handlers.press?.({ ...p, touch: state.touch });
   });
   canvas.addEventListener('pointermove', (e) => {
     const p = toLogical(e);

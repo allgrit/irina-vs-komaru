@@ -41,11 +41,11 @@ export function segmentHits(mosquitoes, ax, ay, bx, by, halfWidth) {
 export function clapRadius(chargeSeconds, mods = {}) {
   const t = TOOLS.clap;
   const k = Math.max(0, Math.min(1, chargeSeconds / t.chargeSeconds));
-  return (t.radiusMin + (t.radiusMax - t.radiusMin) * k) * (mods.radiusMul ?? 1);
+  return (t.radiusMin + (t.radiusMax - t.radiusMin) * k) * (mods.radiusMul ?? 1) + (mods.touchRadius ?? 0);
 }
 
 export function palmRadius(mods = {}) {
-  return TOOLS.palm.radius * (mods.radiusMul ?? 1) * (mods.reflexBoost ? 2 : 1);
+  return TOOLS.palm.radius * (mods.radiusMul ?? 1) * (mods.reflexBoost ? 2 : 1) + (mods.touchRadius ?? 0);
 }
 
 /** Состояние инструментов забега: кулдауны, батареи, заряды. */

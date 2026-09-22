@@ -12,7 +12,7 @@ function esc(s) {
   return String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 }
 
-export function menuScreen(meta, dailyPlayed) {
+export function menuScreen(meta, dailyPlayed, opts = {}) {
   const s = meta.stats;
   return `<div class="screen"><div class="panel">
     <div class="menu-grid">
@@ -42,10 +42,13 @@ export function menuScreen(meta, dailyPlayed) {
         <button class="btn" data-action="missions">📋 Задания</button>
         <button class="btn" data-action="board">🏆 Рекорды</button>
         <button class="btn ghost" data-action="help">❓ Как играть</button>
-        <button class="btn ghost small" data-action="sound">${meta.sound ? '🔊 Звук вкл' : '🔇 Звук выкл'}</button>
+        <div class="row">
+          <button class="btn ghost small" data-action="sound">${meta.sound ? '🔊 Звук вкл' : '🔇 Звук выкл'}</button>
+          ${opts.fullscreen ? '<button class="btn ghost small" data-action="fullscreen">⛶ На весь экран</button>' : ''}
+        </div>
       </div>
     </div>
-    <div class="footer">Мышь или палец — рука Ирины. Клавиши <span class="kbd">1</span>–<span class="kbd">4</span> инструменты, <span class="kbd">L</span> лампа, <span class="kbd">Esc</span> пауза.</div>
+    <div class="footer">${opts.touch ? 'Палец — рука Ирины: тап, зажать, провести. Кнопки инструментов и лампы внизу экрана.' : 'Мышь или палец — рука Ирины. Клавиши <span class="kbd">1</span>–<span class="kbd">4</span> инструменты, <span class="kbd">L</span> лампа, <span class="kbd">Esc</span> пауза.'}</div>
   </div></div>`;
 }
 

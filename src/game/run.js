@@ -399,7 +399,7 @@ function release(run, x, y, sx, sy) {
     if (len < 12) return; // слишком короткий жест — не считаем ударом
     const seg = clipSegment(ax, ay, x, y, cfg.maxLength * run.mods.swatterMul);
     startCooldown(run.toolState, id, run.mods);
-    const hits = segmentHits(run.mosquitoes, seg.ax, seg.ay, seg.bx, seg.by, (cfg.width / 2) * run.mods.swatterMul);
+    const hits = segmentHits(run.mosquitoes, seg.ax, seg.ay, seg.bx, seg.by, (cfg.width / 2) * run.mods.swatterMul + run.mods.touchRadius / 2);
     emit(run, { kind: 'swipe', ...seg });
     if (!hits.length) miss(run, 'swatter', x, y);
     else hitList(run, hits, 'swatter');

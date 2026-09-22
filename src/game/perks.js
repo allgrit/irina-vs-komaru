@@ -55,6 +55,7 @@ export function defaultMods() {
     moonlight: false,
     sprayExtra: 0,
     vampire: 0,
+    touchRadius: 0, // помощь прицеливанию пальцем на тач-устройствах
   };
 }
 

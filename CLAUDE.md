@@ -5,6 +5,8 @@
 
 - Дизайн: `docs/superpowers/specs/2026-09-22-irina-vs-komaru-design.md` — источник истины
   по механикам и балансу. Меняешь баланс — правь `src/game/config.js` и spec вместе.
+- Планировка спальни (ландшафт/портрет) — `src/game/layout.js`; координаты элементов
+  сцены берутся оттуда, не зашивай числа в `scene.js`.
 - Чистая логика (`src/game/*`, `src/core/rng.js`, `src/core/storage.js`) не трогает DOM
   и покрывается тестами `node --test tests/`. Рендер (`src/render/*`) и звук
   (`src/core/audio.js`) — тонкие слои без логики.

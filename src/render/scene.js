@@ -1,5 +1,6 @@
 import { WORLD, POINTS, NIGHT, TOOLS } from '../game/config.js';
 import { visibleAlpha } from '../game/mosquitoes.js';
+import { landscapeLayout } from '../game/layout.js';
 
 // Отрисовка спальни, Ирины, комаров, руки и эффектов. Никакой игровой логики.
 
@@ -8,8 +9,15 @@ const SKIN_DARK = '#d9a98a';
 
 export function createScene(ctx) {
   const fx = [];
-  const stars = [];
-  for (let i = 0; i < 40; i++) stars.push({ x: 700 + Math.random() * 130, y: 120 + Math.random() * 120, s: Math.random() * 1.5 + 0.5, p: Math.random() * 6 });
+  let L = landscapeLayout();
+  let stars = [];
+  function setLayout(layout) {
+    L = layout;
+    const w = L.window;
+    stars = [];
+    for (let i = 0; i < 40; i++) stars.push({ x: w.x + 6 + Math.random() * (w.w - 12), y: w.y + 6 + Math.random() * (w.h - 12), s: Math.random() * 1.5 + 0.5, p: Math.random() * 6 });
+  }
+  setLayout(L);
   let shake = 0;
   let shakeT = 0;
   let redFlash = 0;
@@ -96,46 +104,46 @@ export function createScene(ctx) {
     ctx.fillStyle = '#3a2d28';
     ctx.fillRect(0, POINTS.floor - 8, w, 8);
     // ковёр
+    const cp = L.carpet;
     ctx.fillStyle = '#4a2a3a';
     ctx.beginPath();
-    ctx.ellipse(600, 500, 210, 30, 0, 0, Math.PI * 2);
+    ctx.ellipse(cp.cx, cp.cy, cp.rx, cp.ry, 0, 0, Math.PI * 2);
     ctx.fill();
     ctx.strokeStyle = '#6a3a4a';
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.ellipse(600, 500, 190, 22, 0, 0, Math.PI * 2);
+    ctx.ellipse(cp.cx, cp.cy, cp.rx - 20, cp.ry - 8, 0, 0, Math.PI * 2);
     ctx.stroke();
 
-    drawDoor();
+    if (L.door) drawDoor();
     drawWindow(run, time);
-    drawShelf();
+    if (L.shelf) drawShelf();
     drawBed(run, time);
     drawNightstand(run, time);
     drawOutlet(run, time);
   }
 
   function drawDoor() {
+    const { x, y, w } = L.door;
+    const h = POINTS.floor - y;
     ctx.fillStyle = '#2b2233';
-    ctx.fillRect(14, 150, 96, POINTS.floor - 150);
+    ctx.fillRect(x, y, w, h);
     ctx.fillStyle = '#4a3a55';
-    ctx.fillRect(22, 158, 80, POINTS.floor - 158);
+    ctx.fillRect(x + 8, y + 8, w - 16, h - 8);
     ctx.fillStyle = '#3a2a45';
-    ctx.fillRect(32, 170, 60, 110);
-    ctx.fillRect(32, 300, 60, 120);
+    ctx.fillRect(x + 18, y + 20, w - 36, h * 0.37);
+    ctx.fillRect(x + 18, y + h * 0.5, w - 36, h * 0.4);
     ctx.fillStyle = '#c9a34a';
     ctx.beginPath();
-    ctx.arc(92, 300, 4, 0, Math.PI * 2);
+    ctx.arc(x + w - 18, y + h * 0.5, 4, 0, Math.PI * 2);
     ctx.fill();
     // щель сверху — тёплый свет из коридора
     ctx.fillStyle = 'rgba(255,200,120,0.35)';
-    ctx.fillRect(22, 152, 80, 3);
+    ctx.fillRect(x + 8, y + 2, w - 16, 3);
   }
 
   function drawWindow(run, time) {
-    const x = 690;
-    const y = 110;
-    const ww = 140;
-    const wh = 160;
+    const { x, y, w: ww, h: wh } = L.window;
     // ночь за окном
     const sky = ctx.createLinearGradient(0, y, 0, y + wh);
     sky.addColorStop(0, '#060a1e');
@@ -168,9 +176,9 @@ export function createScene(ctx) {
     // силуэт дерева
     ctx.fillStyle = '#05081a';
     ctx.beginPath();
-    ctx.moveTo(x + 100, y + wh);
-    ctx.quadraticCurveTo(x + 110, y + 90, x + 130, y + 80);
-    ctx.quadraticCurveTo(x + 140, y + 120, x + ww, y + 110);
+    ctx.moveTo(x + ww * 0.7, y + wh);
+    ctx.quadraticCurveTo(x + ww * 0.78, y + wh * 0.55, x + ww * 0.92, y + wh * 0.5);
+    ctx.quadraticCurveTo(x + ww, y + wh * 0.75, x + ww, y + wh * 0.68);
     ctx.lineTo(x + ww, y + wh);
     ctx.fill();
     // рама
@@ -228,33 +236,31 @@ export function createScene(ctx) {
   }
 
   function drawShelf() {
+    const { x: sx, y: sy } = L.shelf;
     ctx.fillStyle = '#4a3a2a';
-    ctx.fillRect(520, 130, 130, 8);
+    ctx.fillRect(sx, sy, 130, 8);
     const books = ['#a33', '#3a6', '#36a', '#ca4', '#a5a'];
-    let bx = 528;
+    let bx = sx + 8;
     books.forEach((c, i) => {
       const bw = 12 + (i % 3) * 4;
       const bh = 30 + (i % 2) * 8;
       ctx.fillStyle = c;
-      ctx.fillRect(bx, 130 - bh, bw, bh);
+      ctx.fillRect(bx, sy - bh, bw, bh);
       bx += bw + 2;
     });
     // фото в рамке
     ctx.fillStyle = '#8a7a5a';
-    ctx.fillRect(610, 92, 34, 38);
+    ctx.fillRect(sx + 90, sy - 38, 34, 38);
     ctx.fillStyle = '#2a3a5a';
-    ctx.fillRect(614, 96, 26, 30);
+    ctx.fillRect(sx + 94, sy - 34, 26, 30);
     ctx.fillStyle = SKIN;
     ctx.beginPath();
-    ctx.arc(627, 108, 6, 0, Math.PI * 2);
+    ctx.arc(sx + 107, sy - 22, 6, 0, Math.PI * 2);
     ctx.fill();
   }
 
   function drawBed(run, time) {
-    const bx = 150;
-    const by = 300;
-    const bw = 290;
-    const bh = 120;
+    const { x: bx, y: by, w: bw, h: bh } = L.bed;
     // изголовье
     ctx.fillStyle = '#5a3a2a';
     roundRect(bx - 16, by - 60, 24, 180, 6);
@@ -310,8 +316,8 @@ export function createScene(ctx) {
   }
 
   function drawIrina(run, time) {
-    const hx = 285;
-    const hy = 300;
+    const hx = L.bed.x + 135;
+    const hy = L.bed.y;
     const awake = run && run.wakeT > 0;
     const worried = run && run.buzzing && !awake;
     const bob = awake ? Math.sin(time * 30) * 2 : Math.sin(time * 1.5) * 1.2;
@@ -430,10 +436,9 @@ export function createScene(ctx) {
   }
 
   function drawNightstand(run, time) {
-    const x = 445;
-    const y = 335;
+    const { x, y } = L.nightstand;
     ctx.fillStyle = '#5a3a2a';
-    roundRect(x, y, 66, 115, 4);
+    roundRect(x, y, 66, POINTS.floor - y, 4);
     ctx.fill();
     ctx.fillStyle = '#6a4a38';
     ctx.fillRect(x - 4, y - 4, 74, 8);
@@ -936,5 +941,5 @@ export function createScene(ctx) {
     ctx.restore();
   }
 
-  return { render, update, addFx, shakeScreen, flash, fx };
+  return { render, update, addFx, shakeScreen, flash, fx, setLayout };
 }

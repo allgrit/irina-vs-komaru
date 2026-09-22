@@ -37,6 +37,9 @@ test('радиус хлопка растёт с зарядом и перком',
   assert.ok(clapRadius(0.4) > 30 && clapRadius(0.4) < 90);
   assert.equal(palmRadius({ radiusMul: 1.4 }), 28 * 1.4);
   assert.equal(palmRadius({ reflexBoost: true }), 56);
+  // тач-помощь прибавляется после множителей
+  assert.equal(palmRadius({ radiusMul: 2, touchRadius: 10 }), 66);
+  assert.equal(clapRadius(0, { touchRadius: 10 }), 40);
 });
 
 test('кулдауны, батарея и заряды', () => {

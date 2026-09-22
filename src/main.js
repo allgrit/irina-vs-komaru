@@ -10,6 +10,8 @@ import { createInput } from './core/input.js';
 import { createScene } from './render/scene.js';
 import { createParticles } from './render/particles.js';
 import * as S from './render/screens.js';
+import { computeLayout, applyLayout, remapRun, fitScale } from './game/layout.js';
+import { POINTS } from './game/config.js';
 
 // ---------------------------------------------------------------- состояние
 const storage = browserStorage();
@@ -53,12 +55,41 @@ function saveAll() {
 }
 saveAll();
 
-// ---------------------------------------------------------------- масштаб
+// ---------------------------------------------------------------- масштаб и планировка
+let layout = null;
+let dpr = 1;
+let canvasScale = 1;
+const isTouchDevice = window.matchMedia?.('(pointer: coarse)').matches || 'ontouchstart' in window;
+
 function fit() {
-  const s = Math.min(window.innerWidth / WORLD.w, window.innerHeight / WORLD.h);
-  document.getElementById('stage').style.transform = `scale(${s})`;
+  const vw = window.innerWidth;
+  const vh = window.innerHeight;
+  const next = computeLayout(vw, vh);
+  if (!layout || next.mode !== layout.mode || next.w !== layout.w || next.h !== layout.h) {
+    const prev = layout;
+    layout = next;
+    applyLayout(layout);
+    scene.setLayout(layout);
+    if (prev && run) remapRun(run, prev, layout);
+    document.body.classList.toggle('portrait', layout.mode === 'portrait');
+    document.body.classList.toggle('landscape', layout.mode === 'landscape');
+  }
+  dpr = Math.min(3, window.devicePixelRatio || 1);
+  const stage = document.getElementById('stage');
+  stage.style.width = `${layout.w}px`;
+  stage.style.height = `${layout.h}px`;
+  canvas.style.width = `${layout.w}px`;
+  canvas.style.height = `${layout.h}px`;
+  const s = fitScale(layout, vw, vh);
+  // рендер в физических пикселях, чтобы канвас не мылился при масштабировании
+  canvas.width = Math.round(layout.w * s * dpr);
+  canvas.height = Math.round(layout.h * s * dpr);
+  canvasScale = canvas.width / layout.w;
+  stage.style.transform = `translate(-50%, -50%) scale(${s})`;
 }
 window.addEventListener('resize', fit);
+window.addEventListener('orientationchange', () => setTimeout(fit, 50));
+document.body.classList.toggle('touch', isTouchDevice);
 fit();
 
 // ---------------------------------------------------------------- экраны
@@ -85,7 +116,7 @@ function showMenu() {
   audio.stopAll();
   audio.setAmbient(false);
   hudEl.classList.add('hidden');
-  show('menu', S.menuScreen(meta, !!dailyDone[todayKey()]));
+  show('menu', S.menuScreen(meta, !!dailyDone[todayKey()], { fullscreen: !!(document.fullscreenEnabled || document.webkitFullscreenEnabled), touch: isTouchDevice }));
 }
 
 function showLoadout() {
@@ -246,7 +277,7 @@ function handleEvents() {
           scene.shakeScreen(12, 0.5);
           scene.flash('white');
           timeScale = 0.3;
-          particles.text(WORLD.w / 2, 200, 'МАТКА ПОВЕРЖЕНА', { color: '#ffcf6a', size: 34, life: 2, vy: -10, bold: true });
+          particles.text(WORLD.w / 2, POINTS.ceiling + 130, 'МАТКА ПОВЕРЖЕНА', { color: '#ffcf6a', size: 34, life: 2, vy: -10, bold: true });
         }
         applyMission({ kind: 'kill', type: ev.type, perched: ev.perched, tool: ev.tool });
         applyMission({ kind: 'combo', value: ev.combo });
@@ -304,7 +335,7 @@ function handleEvents() {
         audio.sfx.absorb();
         break;
       case 'heal':
-        particles.text(300, 260, '+❤️', { color: '#ff7a9a', size: 22 });
+        particles.text(POINTS.ear.x, POINTS.ear.y - 46, '+❤️', { color: '#ff7a9a', size: 22 });
         audio.sfx.heal();
         break;
       case 'stuck':
@@ -315,7 +346,7 @@ function handleEvents() {
         break;
       case 'hourStart':
         audio.sfx.chime();
-        particles.text(WORLD.w / 2, 120, ev.clock, { color: '#ffcf6a', size: 42, life: 1.6, vy: -8, bold: true });
+        particles.text(WORLD.w / 2, POINTS.ceiling + 50, ev.clock, { color: '#ffcf6a', size: 42, life: 1.6, vy: -8, bold: true });
         break;
       case 'hourEnd':
         if (ev.quiet) applyMission({ kind: 'quiet_hour' });
@@ -356,6 +387,8 @@ const pointer = createInput(canvas, WORLD, {
   press(p) {
     audio.resume();
     if (!run || run.phase !== 'play' || paused) return;
+    // палец закрывает цель: на тач-устройствах хитбокс щедрее
+    run.mods.touchRadius = p.touch ? 10 : 0;
     runAction(run, 'press', p);
   },
   release(p) {
@@ -506,6 +539,12 @@ document.getElementById('stage').addEventListener('click', (e) => {
     case 'sound':
       toggleSound();
       break;
+    case 'fullscreen': {
+      const el = document.documentElement;
+      if (document.fullscreenElement) document.exitFullscreen?.();
+      else (el.requestFullscreen || el.webkitRequestFullscreen)?.call(el, { navigationUI: 'hide' });
+      break;
+    }
     default:
       break;
   }
@@ -519,6 +558,7 @@ function saveName() {
 
 // ---------------------------------------------------------------- цикл
 function frame(now) {
+  ctx.setTransform(canvasScale, 0, 0, canvasScale, 0, 0);
   const raw = Math.min(0.05, (now - lastT) / 1000);
   lastT = now;
   timeScale += (1 - timeScale) * Math.min(1, raw * 3);
@@ -541,7 +581,9 @@ function frame(now) {
   }
   particles.update(dt);
   scene.update(dt);
-  scene.render(run, pointer, particles, time, !!run && run.phase === 'play' && !paused);
+  // на тач-устройствах рука рисуется только пока палец на экране: иначе она закрывает цель
+  const showHand = !!run && run.phase === 'play' && !paused && (!isTouchDevice || pointer.down);
+  scene.render(run, pointer, particles, time, showHand);
   requestAnimationFrame(frame);
 }
 

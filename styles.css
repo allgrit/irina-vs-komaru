@@ -19,7 +19,7 @@ button { font-family: inherit; }
 input { font-family: inherit; }
 
 #viewport { position: fixed; inset: 0; display: grid; place-items: center; background: radial-gradient(ellipse at 50% 40%, #171c3a 0%, #0b0d1c 70%); }
-#stage { position: relative; width: 960px; height: 540px; transform-origin: center center; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6); border-radius: 12px; overflow: hidden; }
+#stage { position: absolute; left: 50%; top: 50%; width: 960px; height: 540px; transform-origin: center center; transform: translate(-50%, -50%); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6); border-radius: 12px; overflow: hidden; }
 #game { display: block; width: 960px; height: 540px; touch-action: none; cursor: none; background: #161b36; }
 #game.cursor { cursor: default; }
 
@@ -180,3 +180,56 @@ table.board td.num { text-align: right; font-variant-numeric: tabular-nums; font
 .kbd { display: inline-block; border: 1px solid rgba(255, 255, 255, 0.25); border-bottom-width: 2px; border-radius: 5px; padding: 0 6px; font-size: 12px; font-family: "Consolas", monospace; background: rgba(0, 0, 0, 0.3); }
 .footer { margin-top: 14px; font-size: 12px; color: var(--muted); }
 .footer a { color: var(--muted); }
+
+/* ---------- мобильная адаптация ---------- */
+#stage { touch-action: none; -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+#viewport { padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); }
+body.touch #game { cursor: default; }
+body.touch .tool { width: 68px; height: 68px; }
+
+/* портрет: мир 540×H, HUD в две строки, экраны в одну колонку */
+body.portrait .hud-top { grid-template-columns: 1fr auto; grid-template-areas: "clock score" "sleep sleep"; gap: 8px; top: 8px; left: 8px; right: 8px; }
+body.portrait .hud-clock { grid-area: clock; display: flex; align-items: center; gap: 12px; padding: 6px 10px; }
+body.portrait .hud-clock .clock { font-size: 24px; }
+body.portrait .hud-clock .hour-bar { display: none; }
+body.portrait .hud-clock .hearts { margin-top: 0; }
+body.portrait .hud-score { grid-area: score; display: flex; align-items: center; gap: 10px; padding: 6px 12px; }
+body.portrait .hud-score .score { font-size: 24px; }
+body.portrait .hud-sleep { grid-area: sleep; padding: 6px 12px; }
+body.portrait .hud-sleep .sleep-bar { height: 16px; }
+body.portrait .hud-bottom { left: 8px; right: 8px; bottom: 10px; }
+body.portrait .tool { width: 78px; height: 78px; border-radius: 16px; }
+body.portrait .tool .icon { font-size: 30px; }
+body.portrait .tool .key { display: none; }
+body.portrait .toolbar { gap: 8px; }
+body.portrait .toolbar.side .tool { width: 62px; height: 62px; }
+
+body.portrait .panel { padding: 18px 16px; width: 96%; max-height: 96%; }
+body.portrait .panel h1 { font-size: 34px; }
+body.portrait .panel h2 { font-size: 22px; }
+body.portrait .menu-grid { grid-template-columns: 1fr; gap: 14px; }
+body.portrait .menu-buttons { flex-direction: row; flex-wrap: wrap; }
+body.portrait .menu-buttons .btn { flex: 1 1 45%; font-size: 17px; padding: 14px 12px; }
+body.portrait .menu-buttons .btn.big { flex-basis: 100%; }
+body.portrait .menu-buttons .row { flex-basis: 100%; }
+body.portrait .cards { grid-template-columns: 1fr; gap: 10px; }
+body.portrait .card { min-height: 0; padding: 14px; }
+body.portrait .card .title { font-size: 20px; }
+body.portrait .card .desc { font-size: 15px; }
+body.portrait .shop-grid { grid-template-columns: 1fr 1fr; }
+body.portrait .help-grid { grid-template-columns: 1fr; }
+body.portrait .result-stats { grid-template-columns: 1fr 1fr; }
+body.portrait .big-score { font-size: 44px; }
+body.portrait .chip { flex: 1 1 100%; padding: 12px 14px; }
+body.portrait .chip .t { font-size: 16px; }
+body.portrait .chip .d { font-size: 13px; }
+body.portrait .night-select .chip { flex: 0 0 auto; }
+body.portrait .btn { font-size: 17px; padding: 14px 18px; }
+body.portrait .btn.small { font-size: 14px; padding: 10px 12px; }
+body.portrait input.text { font-size: 17px; padding: 12px; }
+body.portrait table.board { font-size: 14px; }
+body.portrait table.board th:nth-child(6), body.portrait table.board td:nth-child(6) { display: none; }
+body.portrait .share-row { flex-direction: column; }
+body.portrait .footer { font-size: 13px; }
+body.portrait #toasts { top: 120px; width: 90%; }
+body.portrait .toast { text-align: center; }

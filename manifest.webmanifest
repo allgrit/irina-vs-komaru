@@ -1,0 +1,13 @@
+{
+  "name": "Ирина против комаров",
+  "short_name": "Ирина vs комары",
+  "description": "Роглайт-аркада про бессонную ночь: лови комаров, выбирай перки, выживи до утра.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#0b0d1c",
+  "theme_color": "#0b0d1c",
+  "lang": "ru",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
